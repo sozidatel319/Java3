@@ -54,6 +54,16 @@ public class AuthService {
         }
     }
 
+    public static void changeNickInDB(String login) {
+        String sql = String.format("UPDATE nickname WHERE login = %s", login);
+
+        try {
+            stmt.executeUpdate(sql);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public static String getMessageFromDBForNick(String nick) {
         String sql = String.format("SELECT * FROM messages\n" +
                 "WHERE sender='%s'\n" +
