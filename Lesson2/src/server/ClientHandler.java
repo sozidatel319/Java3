@@ -65,6 +65,11 @@ public class ClientHandler {
                             break;
                         }
 
+                        if (str.startsWith("/changenick")){
+                            String [] token = str.split(" +", 3);
+                            AuthService.changeNickInDB(login, token[1]);
+                        }
+
                         if (str.startsWith("/w")) {
                             String[] token = str.split(" +", 3);
                             server.broadcastMsg(token[2], nick, token[1]);

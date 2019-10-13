@@ -54,9 +54,8 @@ public class AuthService {
         }
     }
 
-    public static void changeNickInDB(String login) {
-        String sql = String.format("UPDATE nickname WHERE login = %s", login);
-
+    public static void changeNickInDB(String login, String nickToChange) {
+        String sql = String.format("UPDATE main SET nickname = '%s' WHERE login = '%s'", nickToChange, login);
         try {
             stmt.executeUpdate(sql);
         }catch (SQLException e){
