@@ -11,6 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import server.AuthService;
+import server.ClientHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -92,6 +94,11 @@ public class Controller {
                         if (str.startsWith("/")) {
                             if (str.equals("/end")) {
                                 break;
+                            }
+                            if (str.startsWith("/changenick ")){
+                                String [] token = str.split( " +", 2);
+                                nick = token[1];
+                                showUserNick();
                             }
                             if (str.startsWith("/clientlist ")) {
                                 String[] token = str.split(" ");

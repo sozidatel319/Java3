@@ -1,5 +1,7 @@
 package server;
 
+import client.Controller;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class ClientHandler {
                                     nick = newNick;
                                     login = token[1];
                                     server.subscribe(this);
-                                    System.out.println("Клиент " + nick + " авторизовался");
+                                    server.broadcastMsg("Клиент " + nick + " авторизовался", nick);
                                     timeout(0);
                                     break;
                                 } else {
@@ -60,19 +62,26 @@ public class ClientHandler {
                     //цикл работы
                     while (true) {
                         String str = in.readUTF();
-                        if (str.equals("/end")) {
-                            sendMSG("/end");
-                            break;
-                        }
+                        if (str.startsWith("/")) {
+                            if (str.equals("/end")) {
+                                sendMSG("/end");
+                                break;
+                            }
 
-                        if (str.startsWith("/changenick")){
-                            String [] token = str.split(" +", 3);
-                            AuthService.changeNickInDB(login, token[1]);
-                        }
+                            if (str.startsWith("/changenick")) {
+                                String memory = nick;
+                                String[] token = str.split(" +", 2);
+                                AuthService.changeNickInDB(login, token[1]);
+                                nick = token[1];
+                                sendMSG("/changenick " + nick);
+                                server.broadcastClientList();
+                                server.broadcastMsg(memory + " сменил ник на " + nick, memory);
+                            }
 
-                        if (str.startsWith("/w")) {
-                            String[] token = str.split(" +", 3);
-                            server.broadcastMsg(token[2], nick, token[1]);
+                            if (str.startsWith("/w")) {
+                                String[] token = str.split(" +", 3);
+                                server.broadcastMsg(token[2], nick, token[1]);
+                            }
                         } else {
                             server.broadcastMsg(str, nick);
                         }
