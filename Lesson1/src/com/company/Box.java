@@ -33,7 +33,10 @@ public class Box {
 
     public void pour(Box box) {
         if (this.container.get(0).getType().equals(box.container.get(0).getType())) {
-            box.container.addAll(container);
+
+            for (int i = 0; i < this.container.size(); i++) {
+            box.addFruitToBox(box.container.get(i));
+            }
             container.clear();
             weight = 0;
         }
