@@ -15,7 +15,7 @@ public class Server {
 
     public Server() throws SQLException {
         AuthService.connect();
-        AuthService.addMessageToDB("nick1", null, "qwerty123", "11.11");
+      //  AuthService.addMessageToDB("nick1", null, "qwerty123", "11.11");
 //        System.out.println(AuthService.getNickByLoginAndPass("log2in1","pass1"));
 
         clients = new Vector<>();
@@ -44,6 +44,7 @@ public class Server {
 
     public void broadcastMsg(String msg, String sender) {
         AuthService.addMessageToDB(sender, null, msg, getDate());
+        AuthService.writeHistoryToFile(sender,null,msg,getDate());
         for (ClientHandler c : clients) {
             c.sendMSG(sender + " : " + msg);
         }
@@ -51,6 +52,7 @@ public class Server {
 
     public void broadcastMsg(String msg, String sender, String receiver) {
         AuthService.addMessageToDB(sender, receiver, msg, getDate());
+        AuthService.writeHistoryToFile(sender, receiver, msg, getDate());
         for (ClientHandler c : clients) {
             if (c.getNick().equals(receiver) ||
                     c.getNick().equals(sender)
@@ -66,8 +68,8 @@ public class Server {
         clients.add(clientHandler);
         broadcastClientList();
         clientHandler.sendMSG(
-                AuthService.getMessageFromDBForNick(clientHandler.getNick())
-        );
+               // AuthService.getMessageFromDBForNick(clientHandler.getNick())
+                AuthService.get100messagesFromHistoryInFile(clientHandler.getNick()));
     }
 
     public void unsubscribe(ClientHandler clientHandler) {

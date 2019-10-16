@@ -1,6 +1,8 @@
 package server;
 
+import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 
 public class AuthService {
@@ -43,11 +45,11 @@ public class AuthService {
         return null;
     }
 
-    public static ResultSet getDictionary(){
+    public static ResultSet getDictionary() {
         String sql = "SELECT word FROM dictionary";
         try {
             return stmt.executeQuery(sql);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
@@ -68,9 +70,72 @@ public class AuthService {
         String sql = String.format("UPDATE main SET nickname = '%s' WHERE login = '%s'", nickToChange, login);
         try {
             stmt.executeUpdate(sql);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void writeHistoryToFile(String sender, String receiver, String text, String date) {
+        try {
+            FileWriter fw = new FileWriter("D:\\1.txt", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write(sender + " " + receiver + " " + text + " " + date);
+            bw.newLine();
+            bw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException a) {
+            a.printStackTrace();
+        }
+    }
+
+    public static String get100messagesFromHistoryInFile(String nick) {
+        try {
+            File history = new File("D:\\1.txt");
+            FileReader fr = new FileReader(history);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuffer sb = new StringBuffer();
+            int laststrings = 100;
+            ArrayList<String> fileToStrings = new ArrayList();
+
+            while (br.ready()) {
+                fileToStrings.add(br.readLine());
+            }
+
+            if (fileToStrings.size() > laststrings) {
+                for (int startRead = fileToStrings.size() - laststrings - 1; startRead < fileToStrings.size() - 1; startRead++) {
+                    String[] read = fileToStrings.get(startRead).split(" ", 3);
+                    if (!read[0].equals("")) {
+                        if (read[1].equals("null")) {
+                            sb.append(read[0] + " : " + read[2] + "\n");
+                        } else if (nick.equals(read[1]) || nick.equals(read[0])) {
+                            sb.append("private[ " + read[0] + " ] to [ "
+                                    + read[1] + " ] " + read[2] + "\n");
+                        }
+                    }
+                }
+            } else {
+                for (String msg : fileToStrings) {
+                    String[] read = msg.split(" ", 3);
+                    if (!read[0].equals("")) {
+                        if (read[1].equals("null")) {
+                            sb.append(read[0] + " : " + read[2] + "\n");
+                        } else if (nick.equals(read[1]) || nick.equals(read[0])) {
+                            sb.append("private[ " + read[0] + " ] to [ "
+                                    + read[1] + " ] " + read[2] + "\n");
+                        }
+                    }
+                }
+            }
+            return sb.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException a) {
+            a.printStackTrace();
+        }
+        return null;
     }
 
     public static String getMessageFromDBForNick(String nick) {

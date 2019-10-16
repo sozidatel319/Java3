@@ -2,9 +2,7 @@ package server;
 
 import client.Controller;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashSet;
@@ -49,7 +47,6 @@ public class ClientHandler {
                                     login = token[1];
                                     server.subscribe(this);
                                     server.broadcastMsg("Клиент " + nick + " авторизовался", nick);
-                                    dictionary = (HashSet) AuthService.getDictionary();
                                     timeout(0);
                                     break;
                                 } else {
@@ -84,22 +81,10 @@ public class ClientHandler {
                             if (str.startsWith("/w")) {
                                 String[] token = str.split(" +", 3);
                                 server.broadcastMsg(token[2], nick, token[1]);
+                               // writeHistoryToFile(str);
                             }
                         } else {
-                            String[] msg = str.split(" ");
-                            boolean canWrite = false;
-                            for (String value : msg) {
-                                    for (int i = 0; i < dictionary.size(); i++) {
-                                        if (value.contains(dictionary.toString())) {
-                                            sendMSG("Недопустимое слово!");
-                                            break;
-                                        } else canWrite = true;
-                                    }
-                            }
-
-                            if (canWrite) {
-                                server.broadcastMsg(str, nick);
-                            }
+                            server.broadcastMsg(str, nick);
                         }
                     }
 
