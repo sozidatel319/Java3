@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashSet;
 
 public class ClientHandler {
     private Server server;
@@ -15,6 +16,7 @@ public class ClientHandler {
     DataOutputStream out;
     private String nick;
     private String login;
+    private HashSet dictionary;
 
     public ClientHandler(Server server, Socket socket) {
         try {
@@ -47,6 +49,7 @@ public class ClientHandler {
                                     login = token[1];
                                     server.subscribe(this);
                                     server.broadcastMsg("Клиент " + nick + " авторизовался", nick);
+                                    dictionary = (HashSet) AuthService.getDictionary();
                                     timeout(0);
                                     break;
                                 } else {
@@ -83,7 +86,20 @@ public class ClientHandler {
                                 server.broadcastMsg(token[2], nick, token[1]);
                             }
                         } else {
-                            server.broadcastMsg(str, nick);
+                            String[] msg = str.split(" ");
+                            boolean canWrite = false;
+                            for (String value : msg) {
+                                    for (int i = 0; i < dictionary.size(); i++) {
+                                        if (value.contains(dictionary.toString())) {
+                                            sendMSG("Недопустимое слово!");
+                                            break;
+                                        } else canWrite = true;
+                                    }
+                            }
+
+                            if (canWrite) {
+                                server.broadcastMsg(str, nick);
+                            }
                         }
                     }
 

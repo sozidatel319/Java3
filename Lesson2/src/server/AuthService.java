@@ -43,6 +43,16 @@ public class AuthService {
         return null;
     }
 
+    public static ResultSet getDictionary(){
+        String sql = "SELECT word FROM dictionary";
+        try {
+            return stmt.executeQuery(sql);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void addMessageToDB(String sender, String receiver,
                                       String text, String date) {
         String sql = String.format("INSERT INTO messages(sender, receiver, text, date)\n" +
