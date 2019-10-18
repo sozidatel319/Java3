@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private Server server;
@@ -31,7 +33,9 @@ public class ClientHandler {
 //            System.out.println("socket.getRemoteSocketAddress() "+socket.getRemoteSocketAddress());
 
 
-            new Thread(() -> {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            executorService.execute(() -> {
+
                 try {
                     // цикл авторизации
                     while (true) {
@@ -81,7 +85,7 @@ public class ClientHandler {
                             if (str.startsWith("/w")) {
                                 String[] token = str.split(" +", 3);
                                 server.broadcastMsg(token[2], nick, token[1]);
-                               // writeHistoryToFile(str);
+                                // writeHistoryToFile(str);
                             }
                         } else {
                             server.broadcastMsg(str, nick);
@@ -99,7 +103,9 @@ public class ClientHandler {
                     server.unsubscribe(this);
                     System.out.println("Клиент " + nick + " отключился");
                 }
-            }).start();
+            });
+
+            executorService.shutdown();
 
         } catch (IOException e) {
             e.printStackTrace();
